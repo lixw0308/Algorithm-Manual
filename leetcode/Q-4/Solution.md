@@ -56,13 +56,13 @@ A[i-1] < B[j] && B[j-1] < A[i]
 
 这时，也存在有两种临界条件：
 
-- `i == 0 `或者`j == 0`
-- `i == m`或者`j == n`
+- `i == 0 `或者`j == 0`，说明A/B太小了，到了另一个数组的最左边，方便比较，我们可以认为是最小数
+- `i == m`或者`j == n`，说明A/B太大了，到了另一个数组的最右边，方便比较，我们可以认为是最大数
 
 此时我们直接求解便成了对数组的越界处理，但是对于`javascript`语言来说，我们可以做一个小小的改变就可以不用考虑临界条件：
 
-- 设置`A[-1]=A[0]`,因为在JS里，数组也是个对象，可以给其添加属性。我们单独设置一个-1的key，它的值为第一个元素，这样就可以避免`A[0-1]`时值为`undefined`
-- 由于我们二分中，不会再需要数组的长度，所以我们大可以在取得m、n之后，设置`A[m]=A[m-1]`
+- 设置`A[-1]=-Infinity`,因为在JS里，数组也是个对象，可以给其添加属性。我们单独设置一个-1的key，它的值为最小数，这样就可以避免`A[0-1]`时值为`undefined`
+- 由于我们二分中，不会再需要数组的长度，所以我们大可以在取得m、n之后，设置`A[m]=Infinity`
 
 当不满足时，有以下情况：
 
@@ -79,31 +79,37 @@ S3：若`i>low && A[i-1]>B[j]`，i大了，执行`high=i-1`来在下次循环中
 
 S4：若`i<high && B[j-1]<A[i]`，j大了，执行`low=i+1`来在下次循环中增大i，以便缩小j，继续下一次循环
 
+**以下是最终代码**
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```javascript
+/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number}
+ */
+var findMedianSortedArrays = function(nums1, nums2) {
+    let m=nums1.length;
+    let n=nums2.length;
+    if(m>n) return findMedianSortedArrays(nums2,nums1);
+    nums1[-1]=nums2[-1]=-Infinity;
+    nums1[m]=nums2[n]=Infinity;
+    let low=0,high=m,half=~~((m+n+1)/2);
+    while(low<=high){
+        let i = ~~(low - (low-high)/2);
+        let j = half - i;
+        if(i<high && nums2[j-1]>nums1[i]){
+            low = i+1;
+        } else if(i>low && nums1[i-1] > nums2[j]){
+            high = i-1;
+        } else {
+            if((m+n)%2==1){
+                return Math.max(nums1[i-1],nums2[j-1]);
+            } else {
+                return (Math.max(nums1[i-1],nums2[j-1])+Math.min(nums1[i],nums2[j]))/2;
+            }
+        }
+    }
+    return 0;
+};
+```
 

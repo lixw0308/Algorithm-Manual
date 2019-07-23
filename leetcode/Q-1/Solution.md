@@ -13,5 +13,22 @@
 这里需要注意的是，`if`的判断条件为`obj[target-nums[i]]!==undefined`，如果单纯的写成`if(obj[target-nums[i]])`则会存在bug：当值为0，应返回结果，这里却走了else的逻辑。
 
 如：当前是`nums[0]=2`，取`obj[9-2=7]`不存在，为`undefined`，执行`obj[2]=0`;到了下一次循环`nums[1]=7`，取`obj[9-7=2]`值为`0`，存在，则返回结果`[0,1]`;
+以下是实现代码：
 
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function (nums, target) {
+    let exist = {};
+    for (let i = 0; i < nums.length; i++) {
+        if (exist[target - nums[i]] !== undefined) {
+            return [exist[target - nums[i]], i];
+        }
+        exist[nums[i]] = i;
+    }
+};
+```
 ​	
